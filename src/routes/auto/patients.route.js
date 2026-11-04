@@ -1,26 +1,19 @@
 /**
- * Patient Management routes, mounted on /api/patients in src/app.js.
+ * Patient Management routes (auto-mounted by src/app.js).
  *  - GET  /api/patients      -> list of all patients
  *  - GET  /api/patients/:id  -> one patient, or 404 if it does not exist
  *  - POST /api/patients      -> add a patient { name, age }, or 400 if a field is missing
- * Data is kept in memory for now (no database yet).
  */
-import express from 'express'
+import { Router } from 'express'
+import { patients } from '../../data/hospital.js'
 
-const router = express.Router()
+const router = Router()
 
-const patients = [
-  { id: 1, name: 'Alice Martin', age: 34 },
-  { id: 2, name: 'John Smith', age: 45 }
-]
-
-// GET all patients
-router.get('/', (_req, res) => {
+router.get('/api/patients', (_req, res) => {
   res.status(200).json(patients)
 })
 
-// GET one patient by id
-router.get('/:id', (req, res) => {
+router.get('/api/patients/:id', (req, res) => {
   const id = Number(req.params.id)
   const patient = patients.find((p) => p.id === id)
   if (!patient) {
@@ -29,8 +22,7 @@ router.get('/:id', (req, res) => {
   res.status(200).json(patient)
 })
 
-// POST a new patient
-router.post('/', (req, res) => {
+router.post('/api/patients', (req, res) => {
   const { name, age } = req.body
   if (!name || age === undefined) {
     return res.status(400).json({ error: 'Missing required fields' })
