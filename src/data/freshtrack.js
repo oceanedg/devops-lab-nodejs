@@ -9,7 +9,8 @@ export const products = [
 
 export const batches = [
   { id: 1, productId: 1, quantity: 24, expiryDate: '2026-11-20', status: 'in-stock' },
-  { id: 2, productId: 2, quantity: 12, expiryDate: '2026-11-12', status: 'at-risk' }
+  { id: 2, productId: 2, quantity: 12, expiryDate: '2026-11-12', status: 'at-risk' },
+  { id: 3, productId: 1, quantity: 6, expiryDate: '2026-11-15', status: 'at-risk' }
 ]
 
 export const markdowns = [
