@@ -3,6 +3,7 @@
  *  - GET    /api/markdowns      -> list all
  *  - GET    /api/markdowns/:id  -> one item, or 404
  *  - POST   /api/markdowns      -> create, or 400 if a field is missing
+ *                                  or if the batch already has a markdown
  *  - PUT    /api/markdowns/:id  -> update, or 404
  *  - DELETE /api/markdowns/:id  -> delete (204), or 404
  */
@@ -31,6 +32,10 @@ router.post('/api/markdowns', (req, res) => {
   const missing = REQUIRED.filter((field) => req.body[field] === undefined || req.body[field] === '')
   if (missing.length > 0) {
     return res.status(400).json({ error: 'Missing required fields', fields: missing })
+  }
+  const exists = markdowns.some((item) => item.batchId === Number(req.body.batchId))
+  if (exists) {
+    return res.status(400).json({ error: 'This batch already has a markdown' })
   }
   const item = { id: nextId(markdowns) }
   for (const field of REQUIRED) item[field] = req.body[field]

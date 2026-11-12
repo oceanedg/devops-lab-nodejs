@@ -35,6 +35,12 @@ describe('Markdown API', () => {
     expect(res.body.error).toBe('Missing required fields')
   })
 
+  it('POST /api/markdowns returns 400 when the batch already has a markdown', async () => {
+    const res = await request(app).post('/api/markdowns').send({ batchId: 2, discountRate: 40 })
+    expect(res.status).toBe(400)
+    expect(res.body.error).toBe('This batch already has a markdown')
+  })
+
   it('PUT /api/markdowns/:id updates an item', async () => {
     const res = await request(app).put('/api/markdowns/1').send({ status: 'applied' })
     expect(res.status).toBe(200)
@@ -47,7 +53,7 @@ describe('Markdown API', () => {
   })
 
   it('DELETE /api/markdowns/:id deletes an item', async () => {
-    const created = await request(app).post('/api/markdowns').send({ batchId: 1, discountRate: 20 })
+    const created = await request(app).post('/api/markdowns').send({ batchId: 3, discountRate: 20 })
     const res = await request(app).delete('/api/markdowns/' + created.body.id)
     expect(res.status).toBe(204)
     const check = await request(app).get('/api/markdowns/' + created.body.id)
