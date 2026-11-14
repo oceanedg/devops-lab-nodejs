@@ -7,7 +7,8 @@
  *  - DELETE /api/sales/:id  -> delete (204), or 404
  */
 import { Router } from 'express'
-import { sales, nextId } from '../../data/freshtrack.js'
+
+import { sales, batches, nextId } from '../../data/freshtrack.js'
 
 const router = Router()
 const REQUIRED = ['batchId', 'quantity', 'price']
@@ -26,11 +27,15 @@ router.get('/api/sales/:id', (req, res) => {
   if (index === -1) return res.status(404).json({ error: 'Sale not found' })
   res.status(200).json(sales[index])
 })
-
 router.post('/api/sales', (req, res) => {
   const missing = REQUIRED.filter((field) => req.body[field] === undefined || req.body[field] === '')
   if (missing.length > 0) {
     return res.status(400).json({ error: 'Missing required fields', fields: missing })
+  }
+  const batch = batches.find((item) => item.id === Number(req.body.batchId))
+
+  if (!batch) {
+    return res.status(400).json({ error: 'Batch not found' })
   }
   const item = { id: nextId(sales) }
   for (const field of REQUIRED) item[field] = req.body[field]
