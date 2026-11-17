@@ -40,6 +40,16 @@ describe('Sale API', () => {
     expect(res.status).toBe(200)
     expect(res.body).toMatchObject({ quantity: 4 })
   })
+  it('POST /api/sales returns 400 when the batch does not exist', async () => {
+    const res = await request(app).post('/api/sales').send({
+      batchId: 999,
+      quantity: 2,
+      price: 1.99
+    })
+
+    expect(res.status).toBe(400)
+    expect(res.body.error).toBe('Batch not found')
+  })
 
   it('PUT /api/sales/:id returns 404 for an unknown id', async () => {
     const res = await request(app).put('/api/sales/999').send({ quantity: 4 })
