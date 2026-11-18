@@ -17,7 +17,11 @@ function findIndex (req) {
   return batches.findIndex((item) => item.id === id)
 }
 
-router.get('/api/batches', (_req, res) => {
+router.get('/api/batches', (req, res) => {
+  const { status } = req.query
+  if (status) {
+    return res.status(200).json(batches.filter((item) => item.status === status))
+  }
   res.status(200).json(batches)
 })
 
@@ -31,6 +35,10 @@ router.post('/api/batches', (req, res) => {
   const missing = REQUIRED.filter((field) => req.body[field] === undefined || req.body[field] === '')
   if (missing.length > 0) {
     return res.status(400).json({ error: 'Missing required fields', fields: missing })
+  }
+  const today = new Date().toISOString().slice(0, 10)
+  if (req.body.expiryDate < today) {
+    return res.status(400).json({ error: 'Expiry date is in the past' })
   }
   const item = { id: nextId(batches) }
   for (const field of REQUIRED) item[field] = req.body[field]
