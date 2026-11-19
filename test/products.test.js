@@ -35,6 +35,12 @@ describe('Product API', () => {
     expect(res.body.error).toBe('Missing required fields')
   })
 
+  it('POST /api/products returns 400 when the barcode already exists', async () => {
+    const res = await request(app).post('/api/products').send({ name: 'Other yogurt', category: 'Dairy', barcode: '3017620422003' })
+    expect(res.status).toBe(400)
+    expect(res.body.error).toBe('Barcode already exists')
+  })
+
   it('PUT /api/products/:id updates an item', async () => {
     const res = await request(app).put('/api/products/1').send({ category: 'Fresh fish' })
     expect(res.status).toBe(200)
@@ -47,7 +53,7 @@ describe('Product API', () => {
   })
 
   it('DELETE /api/products/:id deletes an item', async () => {
-    const created = await request(app).post('/api/products').send({ name: 'Fresh salmon 200g', category: 'Fish', barcode: '3560070912345' })
+    const created = await request(app).post('/api/products').send({ name: 'Smoked salmon 100g', category: 'Fish', barcode: '3560070999999' })
     const res = await request(app).delete('/api/products/' + created.body.id)
     expect(res.status).toBe(204)
     const check = await request(app).get('/api/products/' + created.body.id)
