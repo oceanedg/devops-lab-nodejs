@@ -32,6 +32,10 @@ router.post('/api/products', (req, res) => {
   if (missing.length > 0) {
     return res.status(400).json({ error: 'Missing required fields', fields: missing })
   }
+  const duplicate = products.some((item) => item.barcode === req.body.barcode)
+  if (duplicate) {
+    return res.status(400).json({ error: 'Barcode already exists' })
+  }
   const item = { id: nextId(products) }
   for (const field of REQUIRED) item[field] = req.body[field]
   products.push(item)
