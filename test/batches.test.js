@@ -24,7 +24,7 @@ describe('Batch API', () => {
   })
 
   it('POST /api/batches creates an item', async () => {
-    const res = await request(app).post('/api/batches').send({ productId: 1, quantity: 10, expiryDate: '2026-11-30' })
+    const res = await request(app).post('/api/batches').send({ productId: 1, quantity: 10, expiryDate: '2030-01-31' })
     expect(res.status).toBe(201)
     expect(res.body).toHaveProperty('id')
   })
@@ -33,6 +33,19 @@ describe('Batch API', () => {
     const res = await request(app).post('/api/batches').send({})
     expect(res.status).toBe(400)
     expect(res.body.error).toBe('Missing required fields')
+  })
+
+  it('POST /api/batches returns 400 when the expiry date is in the past', async () => {
+    const res = await request(app).post('/api/batches').send({ productId: 1, quantity: 10, expiryDate: '2020-01-01' })
+    expect(res.status).toBe(400)
+    expect(res.body.error).toBe('Expiry date is in the past')
+  })
+
+  it('GET /api/batches?status=at-risk returns only at-risk batches', async () => {
+    const res = await request(app).get('/api/batches?status=at-risk')
+    expect(res.status).toBe(200)
+    expect(res.body.length).toBeGreaterThan(0)
+    expect(res.body.every((item) => item.status === 'at-risk')).toBe(true)
   })
 
   it('PUT /api/batches/:id updates an item', async () => {
@@ -47,7 +60,7 @@ describe('Batch API', () => {
   })
 
   it('DELETE /api/batches/:id deletes an item', async () => {
-    const created = await request(app).post('/api/batches').send({ productId: 1, quantity: 10, expiryDate: '2026-11-30' })
+    const created = await request(app).post('/api/batches').send({ productId: 1, quantity: 10, expiryDate: '2030-01-31' })
     const res = await request(app).delete('/api/batches/' + created.body.id)
     expect(res.status).toBe(204)
     const check = await request(app).get('/api/batches/' + created.body.id)
